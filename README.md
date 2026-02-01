@@ -30,3 +30,4 @@ go test ./...
 - [sample/user.go](sample/user.go)
 - [sample/repository.go](sample/repository.go)
 - [sample/user_test.go](sample/user_test.go)
+- テスト専用のビルダー/ファクトリ: [sample/test_helpers_test.go](sample/test_helpers_test.go)

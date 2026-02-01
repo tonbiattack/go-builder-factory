@@ -78,3 +78,52 @@ func requireDBConnection(t *testing.T, db *sql.DB) {
 func formatTestDSN(dbName string) string {
 	return fmt.Sprintf("root:password@tcp(localhost:3306)/%s?parseTime=true", dbName)
 }
+
+// NewActiveUser は固定パターンのファクトリメソッド例（テスト専用）。
+func NewActiveUser() User {
+	return User{
+		ID:     "u-001",
+		Name:   "Alice",
+		Email:  "alice@example.com",
+		Active: true,
+	}
+}
+
+// UserBuilder は差分指定で生成できるビルダー（テスト専用）。
+type UserBuilder struct {
+	user User
+}
+
+// NewUserBuilder は標準値で初期化したビルダーを返す。
+func NewUserBuilder() *UserBuilder {
+	return &UserBuilder{user: User{
+		ID:     "u-default",
+		Name:   "Default",
+		Email:  "default@example.com",
+		Active: true,
+	}}
+}
+
+func (b *UserBuilder) WithID(id string) *UserBuilder {
+	b.user.ID = id
+	return b
+}
+
+func (b *UserBuilder) WithName(name string) *UserBuilder {
+	b.user.Name = name
+	return b
+}
+
+func (b *UserBuilder) WithEmail(email string) *UserBuilder {
+	b.user.Email = email
+	return b
+}
+
+func (b *UserBuilder) WithInactive() *UserBuilder {
+	b.user.Active = false
+	return b
+}
+
+func (b *UserBuilder) Build() User {
+	return b.user
+}
