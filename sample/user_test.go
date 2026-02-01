@@ -13,30 +13,35 @@ func Testユーザービルダー_非アクティブ生成(t *testing.T) {
 	}
 }
 
-func TestDB接続_アクティブユーザー取得_トランザクションで独立(t *testing.T) {
-	db, err := openTestDB()
-	if err != nil {
-		t.Skipf("TEST_DSN が未設定のためスキップ: %v", err)
+func Testファクトリメソッド_アクティブユーザー生成(t *testing.T) {
+	u := NewActiveUser()
+
+	if !u.Active {
+		t.Fatalf("active user expected")
 	}
+}
+
+func TestDB接続_アクティブユーザー取得_トランザクションで独立(t *testing.T) {
+	db := openTestDB(t)
 	defer db.Close()
 
-	if err := withTx(db, func(tx *sql.Tx) error {
+	requireDBConnection(t, db)
+	ensureSchema(t, db)
+
+	withTx(t, db, func(tx *sql.Tx) {
 		activeUser := NewUserBuilder().WithID("u-1").Build()
 		inactiveUser := NewUserBuilder().WithID("u-2").WithInactive().Build()
 
-		if err := InsertUser(tx, activeUser); err != nil {
-			return err
-		}
-		if err := InsertUser(tx, inactiveUser); err != nil {
-			return err
+		InsertUser(t, tx, activeUser)
+		InsertUser(t, tx, inactiveUser)
+
+		got, err := FindActiveUsers(tx)
+		if err != nil {
+			t.Fatalf("find active users: %v", err)
 		}
 
-		// ここにSUT呼び出しを置く想定（例: FindActiveUsers）
-		// got, err := FindActiveUsers(tx)
-		// ...
-
-		return nil
-	}); err != nil {
-		t.Fatalf("tx test failed: %v", err)
-	}
+		if len(got) != 1 || got[0].ID != "u-1" {
+			t.Fatalf("unexpected result: %+v", got)
+		}
+	})
 }
