@@ -26,6 +26,12 @@ export TEST_DSN="root:password@tcp(localhost:3306)/test_db?parseTime=true"
 go test ./...
 ```
 
+## 注記
+- このサンプルでは「テストが完璧に動作するかどうか」を確認する目的で、実行確認を行っています。
+- フィールド変数の値を直接確認するテストは非常に壊れやすく、原則として導入しない方が良いと考えています。
+- ただし本サンプルでは動作確認のために、あえてフィールド確認テストを含めています。
+- ルールから外れる点がある場合は、サンプルであることを踏まえて明記しています。
+
 ## サンプルコード
 - [sample/user.go](sample/user.go)
 - [sample/repository.go](sample/repository.go)
